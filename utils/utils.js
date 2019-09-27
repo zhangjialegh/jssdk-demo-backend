@@ -6,7 +6,18 @@ var axios = require('axios');
 var config = require('../config/default');
 var WXBizDataCrypt = require('./WXBizDataCrypt')
 var crypto=require("crypto");
+var sha1=require('js-sha1')
 const NODE_ENV = process.env.NODE_ENV === 'dev' ? 'dev' : 'prod'
+function randomString(len) {
+    len = len || 16;
+　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+　　var maxPos = $chars.length;
+　　var pwd = '';
+　　for (i = 0; i < len; i++) {
+　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+　　}
+　　return pwd;
+}
 module.exports = {
     extend: function(target, source, flag) {
         for(var key in source) {
@@ -96,5 +107,61 @@ module.exports = {
         }
 
         return false;
-    }      
+    },
+    get_access_token: function(){
+        let querystring = {
+            'appid': config[NODE_ENV].wechat.app_id,
+            'secret': config[NODE_ENV].wechat.secret_id,
+            'grant_type': config[NODE_ENV].wechat.wechat_grant_type
+        }
+       return axios.get(config[NODE_ENV].wechat.wechat_access_token_url,{
+            params: querystring
+        })
+    },
+    get_jsapi_ticket: function(token){
+        let querystring = {
+            'access_token': token,
+            'type': 'jsapi'
+        }
+       return axios.get(config[NODE_ENV].wechat.wechat_jsapi_ticket_url,{
+            params: querystring
+        })
+    },
+    ticket_to_signature: function(ticket,url){
+        let noncestr=randomString(16)
+        let timestamp=Date.now()
+        let str = `jsapi_ticket=${ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
+        return {
+            noncestr,
+            timestamp,
+            signature: sha1(str),
+            appId: config[NODE_ENV].wechat.app_id
+        }
+    },
+    web_get_code: function(redirect_uri) {
+        return `${config[NODE_ENV].wechat.wechat_get_code_url}?appid=${config[NODE_ENV].wechat.app_id}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=${Date.now()}`
+    },
+    web_code_to_token: function(code){
+        let querystring = {
+            appid: config[NODE_ENV].wechat.app_id,
+            secret: config[NODE_ENV].wechat.secret_id,
+            code: code,
+            grant_type: 'authorization_code'
+        }
+        return axios.get(config[NODE_ENV].wechat.wechat_code_to_token_url, {
+            params: querystring
+        })
+    },
+    web_get_userinfo: function(token,openid){
+        console.log(token,openid, 'token,openid')
+
+        let querystring = {
+            lang: 'zh_CN',
+            openid,
+            access_token: token
+        }
+        return axios.get(config[NODE_ENV].wechat.wechat_get_userinfo_url, {
+            params: querystring
+        })
+    }   
 }

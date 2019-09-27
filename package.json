@@ -23,6 +23,7 @@
     "config-lite": "^2.0.0",
     "cross-env": "^5.2.0",
     "ejs": "^2.5.6",
+    "js-sha1": "^0.6.0",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-mysql-session": "^0.0.2",

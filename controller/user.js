@@ -11,35 +11,73 @@ exports.updateUser = async ctx => {
   console.log(data,'updateUser')
 }
 
-// exports.userUpdate = async ctx => {
-//     const data = ctx.request.body
-//     const {authorization} = ctx.request.header
-//     const token = authorization ? authorization : null
-//     const {openId} = $utils.decodeToken(token).payload.data
-//     try {
-//       const res = await userModel.findUserData(openId)
-//       if(res[0]) {
-//         const User = res[0]
-//         try {
-//           await userModel.updateUserData(User, data)
-//           ctx.body = {
-//             code: 200,
-//             msg: 'update userinfo success'
-//           }
-//         } catch (error) {
-//           console.log(err)
-//         }
-//       } else {
-//         ctx.body = {
-//           code: 201,
-//           msg: 'not found user'
-//         }
-//       }
-//     } catch (err) {
-//       ctx.body = {
-//         code: 500,
-//         msg: err.message
-//       }
-//     }
-// }
+exports.getUserInfo = async ctx => {
+    const {authorization} = ctx.request.header
+    const token = authorization ? authorization : null
+    if (!token) {
+      ctx.body = {
+        code: 403,
+        msg: 'not found user'
+      }
+      return
+    }
+    const {openId} = $utils.decodeToken(token).payload.data
+    try {
+      const res = await userModel.findUserData(openId)
+      if(res[0]) {
+        const User = res[0]
+        try {
+          ctx.body = {
+            code: 200,
+            success: true,
+            data: User
+          }
+        } catch (error) {
+          console.log(err)
+        }
+      } else {
+        ctx.body = {
+          code: 403,
+          msg: 'not found user'
+        }
+      }
+    } catch (err) {
+      ctx.body = {
+        code: 500,
+        msg: err.message
+      }
+    }
+}
+
+exports.userUpdate = async ctx => {
+    const data = ctx.request.body
+    const {authorization} = ctx.request.header
+    const token = authorization ? authorization : null
+    const {openId} = $utils.decodeToken(token).payload.data
+    try {
+      const res = await userModel.findUserData(openId)
+      if(res[0]) {
+        const User = res[0]
+        try {
+          await userModel.updateUserData(User, data)
+          ctx.body = {
+            code: 200,
+            msg: 'update userinfo success'
+          }
+        } catch (error) {
+          console.log(err)
+        }
+      } else {
+        ctx.body = {
+          code: 201,
+          msg: 'not found user'
+        }
+      }
+    } catch (err) {
+      ctx.body = {
+        code: 500,
+        msg: err.message
+      }
+    }
+}
 

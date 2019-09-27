@@ -57,3 +57,97 @@ exports.wxLogin = async ctx => {
   }
 }
 
+exports.wxToken = async ctx => {
+  try {
+    const tokenRes = await $utils.get_access_token()
+    const ticketRes = await $utils.get_jsapi_ticket(tokenRes.data.access_token)
+    const {url} = ctx.request.query
+    const res = $utils.ticket_to_signature(ticketRes.data.ticket, url)
+    ctx.body = {
+      code: 200,
+      success: true,
+      data: res
+    }  
+
+  } catch (error) {
+    
+  }
+}
+
+exports.wxCode = async ctx => {
+  try {
+    const {url} = ctx.request.query
+    const res = await $utils.web_get_code(url)
+    ctx.body = {
+      code: 200,
+      success: true,
+      data: res
+    }  
+
+  } catch (error) {
+    console.log(error, 'errror')
+  }
+}
+
+exports.wxUserInfo = async ctx => {
+  try {
+    const {code} = ctx.request.query
+    const codRes = await $utils.web_code_to_token(code)
+    const accessToken = codRes.data.access_token
+    const openId = codRes.data.openid
+    const res = await $utils.web_get_userinfo(accessToken, openId)
+    let data={}
+        data['wechatOpenid'] = openId
+        data['thirdSession'] = $utils.createToken({openId: openId},3)
+        data['wechatNickname'] = res.data.nickname
+        data['wechatProvince'] = res.data.province
+        data['wechatCity'] = res.data.city
+        data['wechatCountry'] = res.data.country
+        data['wechatOpenid'] = openId
+        data['wechatAvatarUri'] = res.data.headimgurl
+    try {
+      const resMiddle = await userModel.findUserData(openId)
+      delete data['wechatOpenid']
+      if(resMiddle[0]) {
+        ctx.body = {
+          success: true,
+          code: 200,
+          message: '用户登录成功',
+          data: {
+            ...data,
+            id: resMiddle[0].id
+          }
+        }
+      } else {
+       try {
+         const user = await userModel.createUser(data)
+         delete data['wechatOpenid']
+         if(user) {
+          ctx.body = {
+            code: 200,
+            success: true,
+            data: {
+              ...data,
+              id: resMiddle.insertId
+            }
+          }    
+        }
+       } catch (err) {
+        ctx.body = {
+          code: 500,
+          msg: err.message
+        }
+       }
+      }
+    } catch (err) {
+      ctx.body = {
+        code: 500,
+        msg: err.message
+      }
+    }
+
+  } catch (error) {
+    console.log(error, 'errror')
+  }
+}
+
