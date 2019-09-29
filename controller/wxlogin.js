@@ -106,7 +106,7 @@ exports.wxUserInfo = async ctx => {
         data['wechatAvatarUri'] = res.data.headimgurl
     try {
       const resMiddle = await userModel.findUserData(openId)
-      const dataDemo = JSON.parse(JOSN.stringify(data))
+      const dataDemo = JSON.parse(JSON.stringify(data))
       delete dataDemo['wechatOpenid']
       if(resMiddle[0]) {
         ctx.body = {
