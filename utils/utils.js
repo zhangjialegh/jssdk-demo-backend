@@ -153,8 +153,6 @@ module.exports = {
         })
     },
     web_get_userinfo: function(token,openid){
-        console.log(token,openid, 'token,openid')
-
         let querystring = {
             lang: 'zh_CN',
             openid,
