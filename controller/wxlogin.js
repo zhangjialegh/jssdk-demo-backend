@@ -7,8 +7,8 @@ exports.wxLogin = async ctx => {
     const openId = res.data.openid
     const scene = ctx.request.body.scene
     let data={}
-        data['wechat_openid'] = openId
-        data['third_session'] = $utils.createToken({openId: openId},3)
+        data['wechatOpenid'] = openId
+        data['thirdSession'] = $utils.createToken({openId: openId},3)
         data['scene'] = scene
     let params = []
     Object.keys(data).map((item) => {
@@ -21,7 +21,7 @@ exports.wxLogin = async ctx => {
           success: true,
           code: 200,
           message: '用户登录成功',
-          third_session: data['third_session'],
+          third_session: data['thirdSession'],
           id: resMiddle[0].id
         }
       } else {
@@ -31,7 +31,7 @@ exports.wxLogin = async ctx => {
           ctx.body = {
             code: 200,
             success: true,
-            third_session: data['third_session'],
+            third_session: data['thirdSession'],
             id: resMiddle.insertId
           }    
         }
@@ -97,7 +97,6 @@ exports.wxUserInfo = async ctx => {
     const openId = codRes.data.openid
     const res = await $utils.web_get_userinfo(accessToken, openId)
     let data={}
-        data['wechatOpenid'] = openId
         data['thirdSession'] = $utils.createToken({openId: openId},3)
         data['wechatNickname'] = res.data.nickname
         data['wechatProvince'] = res.data.province
@@ -121,13 +120,15 @@ exports.wxUserInfo = async ctx => {
       } else {
        try {
          const user = await userModel.createUser(data)
-         delete data['wechatOpenid']
+         const dataDemo = JSON.parse(JOSN.stringify(data))
+         delete dataDemo['wechatOpenid']
+
          if(user) {
           ctx.body = {
             code: 200,
             success: true,
             data: {
-              ...data,
+              ...dataDemo,
               id: resMiddle.insertId
             }
           }    
