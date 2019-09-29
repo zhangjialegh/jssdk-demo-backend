@@ -106,23 +106,21 @@ exports.wxUserInfo = async ctx => {
         data['wechatAvatarUri'] = res.data.headimgurl
     try {
       const resMiddle = await userModel.findUserData(openId)
-      delete data['wechatOpenid']
+      const dataDemo = JSON.parse(JOSN.stringify(data))
+      delete dataDemo['wechatOpenid']
       if(resMiddle[0]) {
         ctx.body = {
           success: true,
           code: 200,
           message: '用户登录成功',
           data: {
-            ...data,
+            ...dataDemo,
             id: resMiddle[0].id
           }
         }
       } else {
        try {
          const user = await userModel.createUser(data)
-         const dataDemo = JSON.parse(JOSN.stringify(data))
-         delete dataDemo['wechatOpenid']
-
          if(user) {
           ctx.body = {
             code: 200,
