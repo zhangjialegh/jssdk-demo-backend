@@ -20,7 +20,8 @@ const NODE_ENV = process.env.NODE_ENV === 'dev' ? 'dev' : 'prod'
 const sessionMysqlConfig= {
   user: config[NODE_ENV].database.USERNAME,
   password: config[NODE_ENV].database.PASSWORD,
-  database: config[NODE_ENV].database.DATABASE
+  database: config[NODE_ENV].database.DATABASE,
+  host: config[NODE_ENV].database.HOST
 }
 
 // 配置session中间件

@@ -16,7 +16,8 @@ exports.getUserInfo = async ctx => {
     const token = authorization ? authorization : null
     if (!token) {
       ctx.body = {
-        code: 403,
+        success: false,
+        code: 401,
         msg: 'not found user'
       }
       return
@@ -42,7 +43,9 @@ exports.getUserInfo = async ctx => {
         }
       }
     } catch (err) {
+      ctx.response.status = 500
       ctx.body = {
+        success: false,
         code: 500,
         msg: err.message
       }
@@ -68,13 +71,16 @@ exports.userUpdate = async ctx => {
           console.log(err)
         }
       } else {
+        ctx.response.status = 201
         ctx.body = {
           code: 201,
           msg: 'not found user'
         }
       }
     } catch (err) {
+      ctx.response.status = 500
       ctx.body = {
+        success: false,
         code: 500,
         msg: err.message
       }
