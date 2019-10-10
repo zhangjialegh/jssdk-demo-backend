@@ -91,9 +91,15 @@ exports.wxToken = async ctx => {
 exports.wxCode = async ctx => {
   try {
     const {
-      url
+      url,
+      web
     } = ctx.request.query
-    const res = await $utils.web_get_code(url)
+    let res = null
+    if (`${web}` === '1') {
+      res = await $utils.web_get_qrcode('https://qq.jd.com/new/wx/callback.action?view=null')
+    } else {
+      res = await $utils.web_get_code(url)
+    }
     ctx.body = {
       code: 200,
       success: true,

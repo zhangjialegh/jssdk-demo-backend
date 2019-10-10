@@ -142,6 +142,9 @@ module.exports = {
   web_get_code: function(redirect_uri) {
     return `${config[NODE_ENV].wechat.wechat_get_code_url}?appid=${config[NODE_ENV].wechat.app_id}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=${Date.now()}`
   },
+  web_get_qrcode: function(redirect_uri) {
+    return `${config[NODE_ENV].wechat.wechat_get_qrcode_url}?appid=${config[NODE_ENV].wechat.jd_id}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_login&state=${Date.now()}`
+  },
   web_code_to_token: function(code) {
     let querystring = {
       appid: config[NODE_ENV].wechat.app_id,
