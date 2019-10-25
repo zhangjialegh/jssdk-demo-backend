@@ -1,10 +1,7 @@
 ```bash
-# 创建数据库
-yarn createDB
+# start mysql server
+docker-compose up
 
-# alert数据库
-yarn alertDB
-
-# 启动服务
-yarn dev
+# start node server
+yarn start
 ```
