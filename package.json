@@ -19,7 +19,7 @@
   "author": "zjl1195185765@outlook.com",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "config-lite": "^2.0.0",
     "cross-env": "^5.2.0",
     "ejs": "^2.5.6",
